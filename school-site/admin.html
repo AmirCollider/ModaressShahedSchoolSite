@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1f4f7a">
+  <title>مدیریت | مدرسه شاهد</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="admin">
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html">
+        <div class="logo-box"><img src="assets/logo.png" alt="لوگوی مدرسه" onerror="this.style.display='none'; this.parentElement.classList.add('logo-placeholder');"></div>
+        <div>
+          <div class="school-name">مدرسه شاهد</div>
+          <div class="school-subtitle">دبیرستان دوره دوم منطقه ۱۲ تهران</div>
+        </div>
+      </a>
+      <nav class="nav" aria-label="منوی اصلی">
+        <a class="nav-link" href="index.html">خانه</a>
+        <a class="nav-link" href="news.html">اخبار و اطلاعیه‌ها</a>
+        <a class="nav-link active" href="admin.html">مدیریت</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-main">
+    <section class="section admin-section">
+      <div class="container narrow">
+        <div id="login-panel" class="panel auth-panel">
+          <span class="eyebrow">بخش مدیریت</span>
+          <h1>ورود مدیر</h1>
+          <p>برای مدیریت اطلاعیه‌ها، رمز عبور مدیر را وارد کنید.</p>
+          <form id="login-form" class="stack">
+            <label class="field">
+              <span>رمز عبور</span>
+              <input id="password" type="password" autocomplete="current-password" required>
+            </label>
+            <button class="btn btn-primary" type="submit">ورود به مدیریت</button>
+            <div id="login-error" class="form-message error" role="alert" hidden>رمز عبور نادرست است.</div>
+          </form>
+        </div>
+
+        <div id="admin-panel" hidden>
+          <div class="admin-toolbar">
+            <div>
+              <span class="eyebrow">مدیریت محتوا</span>
+              <h1>مدیریت اطلاعیه‌ها</h1>
+            </div>
+            <button id="logout-btn" class="btn btn-secondary" type="button">خروج</button>
+          </div>
+
+          <div class="panel">
+            <form id="news-form" class="stack">
+              <input id="editing-id" type="hidden">
+              <div class="form-grid">
+                <label class="field">
+                  <span>عنوان اطلاعیه</span>
+                  <input id="news-title" type="text" maxlength="120" required placeholder="مثلاً جلسه اولیا و مربیان">
+                </label>
+                <label class="field">
+                  <span>تاریخ</span>
+                  <input id="news-date" type="text" maxlength="30" required placeholder="مثلاً ۱۴۰۵/۰۶/۰۵">
+                </label>
+              </div>
+              <label class="field">
+                <span>متن اطلاعیه</span>
+                <textarea id="news-body" rows="7" maxlength="3000" required placeholder="متن کامل اطلاعیه را وارد کنید..."></textarea>
+              </label>
+              <div class="form-actions">
+                <button class="btn btn-primary" type="submit" id="save-news-btn">ثبت اطلاعیه</button>
+                <button class="btn btn-secondary" type="button" id="cancel-edit-btn" hidden>انصراف از ویرایش</button>
+              </div>
+              <div id="save-message" class="form-message success" hidden>اطلاعیه با موفقیت ذخیره شد.</div>
+            </form>
+          </div>
+
+          <div class="panel">
+            <div class="panel-heading">
+              <h2>اطلاعیه‌های موجود</h2>
+              <span id="news-count" class="count-badge">۰ مورد</span>
+            </div>
+            <div id="admin-news-list" class="admin-news-list"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>مدرسه شاهد ـ دبیرستان دوره دوم منطقه ۱۲ تهران</span>
+      <span>سامانه اطلاع‌رسانی مدرسه</span>
+    </div>
+  </footer>
+
+  <script src="js/storage.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
