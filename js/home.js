@@ -6,11 +6,12 @@ function renderLatest() {
     return;
   }
   target.innerHTML = items.map(item => `
-    <article class="news-card">
+    <article class="news-card reveal">
       <div class="news-date">${escapeHtml(item.date)}</div>
       <h3>${escapeHtml(item.title)}</h3>
       <p>${escapeHtml(item.body)}</p>
     </article>
   `).join("");
+  initScrollReveal(target);
 }
 document.addEventListener("DOMContentLoaded", renderLatest);
