@@ -1,12 +1,8 @@
 /*
-  Offline demo password.
-  Change this value before distributing the site.
-  NOTE: Because this version runs entirely in the browser, this is NOT secure
-  against someone who has access to the source files. When going online,
-  authentication should move to a server/Cloudflare Worker.
+  ورود پنل مدیریت اکنون سمت سرور بررسی می‌شود (worker.js + Secret واقعی در
+  Cloudflare)، نه با یک رمز ثابت داخل این فایل. برای تنظیم/تغییر رمز:
+    wrangler secret put ADMIN_PASSWORD
 */
-const ADMIN_PASSWORD = "1234";
-const SESSION_KEY = "school_admin_session";
 
 const loginPanel = document.getElementById("login-panel");
 const adminPanel = document.getElementById("admin-panel");
@@ -22,10 +18,6 @@ const cancelEditBtn = document.getElementById("cancel-edit-btn");
 const adminNewsList = document.getElementById("admin-news-list");
 const newsCount = document.getElementById("news-count");
 const saveMessage = document.getElementById("save-message");
-
-function isLoggedIn() {
-  return sessionStorage.getItem(SESSION_KEY) === "1";
-}
 
 function showAdmin() {
   loginPanel.hidden = true;
@@ -48,10 +40,10 @@ function renderAdminNews() {
   }
 
   adminNewsList.innerHTML = items.map(item => `
-    <article class="admin-news-item">
+    <article class="admin-news-item reveal">
       <div>
-        <h3>${escapeHtml(item.title)}</h3>
         <div class="news-date">${escapeHtml(item.date)}</div>
+        <h3>${escapeHtml(item.title)}</h3>
         <p>${escapeHtml(item.body)}</p>
       </div>
       <div class="admin-actions">
@@ -60,6 +52,7 @@ function renderAdminNews() {
       </div>
     </article>
   `).join("");
+  initScrollReveal(adminNewsList);
 }
 
 function resetForm() {
@@ -69,15 +62,27 @@ function resetForm() {
   cancelEditBtn.hidden = true;
 }
 
-loginForm.addEventListener("submit", (event) => {
+loginForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const password = document.getElementById("password").value;
+  loginError.hidden = true;
 
-  if (password === ADMIN_PASSWORD) {
-    sessionStorage.setItem(SESSION_KEY, "1");
-    loginError.hidden = true;
-    showAdmin();
-  } else {
+  try {
+    const res = await fetch("/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password })
+    });
+    const data = await res.json();
+
+    if (res.ok && data.ok) {
+      showAdmin();
+    } else {
+      loginError.textContent = data.error || "رمز عبور نادرست است.";
+      loginError.hidden = false;
+    }
+  } catch {
+    loginError.textContent = "خطا در ارتباط با سرور. دوباره تلاش کنید.";
     loginError.hidden = false;
   }
 });
@@ -136,13 +141,26 @@ adminNewsList.addEventListener("click", (event) => {
   }
 });
 
-document.getElementById("logout-btn").addEventListener("click", () => {
-  sessionStorage.removeItem(SESSION_KEY);
+document.getElementById("logout-btn").addEventListener("click", async () => {
+  try {
+    await fetch("/api/logout", { method: "POST" });
+  } catch {
+    // اگر شبکه در دسترس نبود هم همچنان کاربر را از حالت نمایش خارج می‌کنیم
+  }
   resetForm();
   showLogin();
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-  if (isLoggedIn()) showAdmin();
-  else showLogin();
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const res = await fetch("/api/session");
+    const data = await res.json();
+    if (data.loggedIn) {
+      showAdmin();
+      return;
+    }
+  } catch {
+    // خطای شبکه: فرم ورود نمایش داده می‌شود
+  }
+  showLogin();
 });
