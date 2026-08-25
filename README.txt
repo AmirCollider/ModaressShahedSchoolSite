@@ -3,19 +3,12 @@
 
 مدرسه شاهد ـ دبیرستان دوره دوم منطقه ۱۲ تهران
 
-صفحات:
-- index.html     صفحه اصلی
-- news.html      اخبار و اطلاعیه‌ها
-- admin.html     مدیریت
-
-شروع:
-1) فایل index.html را با مرورگر باز کنید.
-2) از منوی «مدیریت» وارد بخش مدیریت شوید.
-3) رمز اولیه نسخه آزمایشی: 1234
-
-ذخیره‌سازی:
-اطلاعیه‌ها داخل localStorage همان مرورگر ذخیره می‌شوند.
-برای نسخه آنلاین، بهتر است ذخیره‌سازی و احراز هویت به Cloudflare Worker منتقل شود.
-
 لوگو:
 فایل assets/logo.png را با لوگوی واقعی مدرسه جایگزین کنید.
+
+محل اجرا : ClaudeFlayerWorker
+محل میزبانی خود کد ها : گیت هاب
+دیتابیس cloudflare D1 : modaressshahedschoolsite-db
+هاست cloudflare R2 : modaressshahedschoolsite-r2
+Custom R2 bucket Domain : dl.modares12.com
+محل لوگوی سایت : dl.modares12.com/Logo/Logo.png
