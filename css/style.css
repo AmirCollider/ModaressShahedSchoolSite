@@ -1,102 +1,323 @@
-@font-face{font-family:VazirmatnLocal;src:local("Vazirmatn"),local("Vazir");font-display:swap}
+/* ==========================================================================
+   مدرسه شاهد — دبیرستان دوره دوم منطقه ۱۲ تهران
+   سیستم طراحی: آبی نهادی + طلایی (الهام‌گرفته از مهر و اطلاعیه‌ی رسمی مدرسه)
+   فونت: Vazirmatn (وزیرمتن) — بارگذاری در <head> هر صفحه
+   ========================================================================== */
+
 :root{
-  --primary:#1f4f7a;
-  --primary-dark:#173b5c;
-  --accent:#d69e2e;
-  --text:#1d2733;
-  --muted:#657384;
+  /* رنگ */
+  --primary:#163a5c;
+  --primary-dark:#0d2740;
+  --primary-light:#3a6d9c;
+  --accent:#c8962c;
+  --accent-dark:#a97a1c;
+  --accent-soft:#f6ecd4;
+  --ink:#172433;
+  --muted:#5c6b7c;
+  --muted-soft:#8494a6;
   --surface:#ffffff;
   --surface-2:#f5f8fb;
-  --border:#dfe7ef;
-  --danger:#b42318;
-  --success:#157347;
-  --radius:16px;
-  --shadow:0 12px 35px rgba(21,50,78,.08)
+  --surface-3:#eef3f8;
+  --border:#e3e9f0;
+  --danger:#b3261e;
+  --danger-soft:#fdecea;
+  --success:#1f7a4d;
+  --success-soft:#e9f7ef;
+
+  /* هندسه */
+  --radius-sm:10px;
+  --radius:18px;
+  --radius-lg:28px;
+  --shadow-sm:0 4px 16px rgba(13,39,64,.06);
+  --shadow:0 18px 46px rgba(13,39,64,.10);
+  --shadow-lg:0 30px 72px rgba(13,39,64,.16);
+
+  /* حرکت */
+  --ease:cubic-bezier(.22,1,.36,1);
+  --fast:.2s;
+  --normal:.35s;
+  --slow:.7s;
 }
+
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{
-  margin:0;background:var(--surface-2);color:var(--text);
-  font-family:VazirmatnLocal,Tahoma,Arial,sans-serif;line-height:1.8
+  margin:0;background:var(--surface-2);color:var(--ink);
+  font-family:"Vazirmatn",Tahoma,Arial,sans-serif;
+  line-height:1.85;
+  -webkit-font-smoothing:antialiased;
 }
 a{color:inherit;text-decoration:none}
-button,input,textarea{font:inherit}
+button,input,textarea{font-family:inherit}
+img{max-width:100%;display:block}
+
 .container{width:min(1120px,calc(100% - 32px));margin:0 auto}
-.narrow{width:min(860px,calc(100% - 32px))}
-.site-header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
-.header-inner{min-height:78px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.narrow{width:min(760px,calc(100% - 32px))}
+
+::selection{background:var(--accent-soft);color:var(--primary-dark)}
+
+:focus-visible{
+  outline:3px solid var(--accent);
+  outline-offset:3px;
+  border-radius:6px;
+}
+
+/* ==========================================================================
+   حرکت پایه — بارگذاری، ورود هنگام اسکرول، حساسیت به حرکت کاهش‌یافته
+   ========================================================================== */
+@keyframes fadeRise{
+  from{opacity:0;transform:translateY(18px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+.reveal{
+  opacity:0;
+  transform:translateY(24px);
+  transition:opacity var(--slow) var(--ease), transform var(--slow) var(--ease);
+}
+.reveal.is-visible{opacity:1;transform:translateY(0)}
+.news-grid .reveal:nth-child(1),.news-list .reveal:nth-child(1),.admin-news-list .reveal:nth-child(1){transition-delay:.03s}
+.news-grid .reveal:nth-child(2),.news-list .reveal:nth-child(2),.admin-news-list .reveal:nth-child(2){transition-delay:.11s}
+.news-grid .reveal:nth-child(3),.news-list .reveal:nth-child(3),.admin-news-list .reveal:nth-child(3){transition-delay:.19s}
+.news-grid .reveal:nth-child(4),.news-list .reveal:nth-child(4),.admin-news-list .reveal:nth-child(4){transition-delay:.27s}
+.news-grid .reveal:nth-child(n+5),.news-list .reveal:nth-child(n+5),.admin-news-list .reveal:nth-child(n+5){transition-delay:.33s}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{
+    animation-duration:.001ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;
+  }
+  .reveal{opacity:1;transform:none}
+}
+
+/* ==========================================================================
+   هدر — کاملاً وسط‌چین، به‌صورت یک نوار پیوسته در همه‌ی صفحات
+   ========================================================================== */
+.site-header{
+  position:sticky;top:0;z-index:20;
+  background:rgba(255,255,255,.92);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+}
+.header-inner{
+  display:flex;flex-direction:column;align-items:center;
+  gap:14px;padding:18px 0;
+}
 .brand{display:flex;align-items:center;gap:12px;min-width:0}
-.logo-box{width:52px;height:52px;border-radius:13px;border:1px solid var(--border);background:#fff;display:grid;place-items:center;overflow:hidden;flex:none}
+.logo-box{
+  width:54px;height:54px;border-radius:15px;
+  border:1px solid var(--border);background:#fff;
+  display:grid;place-items:center;overflow:hidden;flex:none;
+  transition:transform var(--normal) var(--ease), box-shadow var(--normal) var(--ease);
+}
 .logo-box img{width:100%;height:100%;object-fit:contain}
 .logo-placeholder:after{content:"ش";font-size:24px;font-weight:800;color:var(--primary)}
-.school-name{font-size:1rem;font-weight:850;white-space:nowrap}
-.school-subtitle{font-size:.76rem;color:var(--muted);white-space:nowrap}
-.nav{display:flex;align-items:center;gap:4px}
-.nav-link{padding:8px 12px;border-radius:10px;color:var(--muted);font-size:.9rem}
-.nav-link:hover,.nav-link.active{background:#edf4fa;color:var(--primary);font-weight:700}
-.hero{background:linear-gradient(135deg,#edf5fb,#fff);border-bottom:1px solid var(--border)}
-.hero-content{padding:78px 0 88px}
-.eyebrow{display:inline-block;color:var(--primary);font-size:.8rem;font-weight:800;margin-bottom:8px}
+.brand:hover .logo-box{transform:scale(1.06);box-shadow:0 0 0 7px var(--accent-soft)}
+.school-name{font-size:1.02rem;font-weight:800;white-space:nowrap;text-align:center}
+.school-subtitle{font-size:.76rem;color:var(--muted);white-space:nowrap;text-align:center}
+
+.nav{
+  display:flex;align-items:center;gap:2px;
+  background:var(--surface-3);padding:6px;border-radius:999px;
+}
+.nav-link{
+  padding:9px 18px;border-radius:999px;color:var(--muted);
+  font-size:.88rem;font-weight:700;
+  transition:background var(--fast) var(--ease), color var(--fast) var(--ease), box-shadow var(--fast) var(--ease);
+}
+.nav-link:hover{background:#fff;color:var(--primary);box-shadow:var(--shadow-sm)}
+.nav-link.active{background:var(--primary);color:#fff;box-shadow:0 8px 18px rgba(22,58,92,.25)}
+
+/* ==========================================================================
+   قهرمان صفحه‌ی اصلی — نشان مهرگونه‌ی تزئینی پشت متن، کاملاً وسط‌چین
+   ========================================================================== */
+.hero{
+  position:relative;overflow:hidden;text-align:center;
+  background:linear-gradient(180deg,#eef4fa 0%,#ffffff 100%);
+  border-bottom:1px solid var(--border);
+}
+.hero::before,.hero::after{
+  content:"";position:absolute;top:50%;left:50%;border-radius:50%;
+  pointer-events:none;
+}
+.hero::before{
+  width:600px;height:600px;margin:-300px 0 0 -300px;
+  border:1px dashed rgba(200,150,44,.35);
+}
+.hero::after{
+  width:440px;height:440px;margin:-220px 0 0 -220px;
+  border:1px solid rgba(13,39,64,.08);
+}
+.hero-content{
+  position:relative;z-index:1;
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  padding:88px 0 96px;
+}
+.hero-content>*{animation:fadeRise .8s var(--ease) both}
+.hero-content .eyebrow{animation-delay:.05s}
+.hero-content h1{animation-delay:.16s}
+.hero-content p{animation-delay:.3s}
+.hero-content .hero-actions{animation-delay:.44s}
+
+.eyebrow{
+  display:inline-flex;align-items:center;gap:7px;
+  color:var(--accent-dark);font-size:.8rem;font-weight:800;
+  letter-spacing:.03em;margin-bottom:10px;
+}
+.eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
+
 h1,h2{line-height:1.35;margin:0 0 12px}
-h1{font-size:clamp(2rem,4vw,3.2rem);letter-spacing:-.03em}
-h2{font-size:1.55rem}
-.hero p,.page-intro p{color:var(--muted);font-size:1.02rem;max-width:680px}
-.hero-actions,.form-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
-.btn{border:0;border-radius:11px;padding:10px 18px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-weight:800;transition:.18s transform,.18s box-shadow}
-.btn:hover{transform:translateY(-1px)}
-.btn-primary{background:var(--primary);color:#fff;box-shadow:0 8px 18px rgba(31,79,122,.18)}
+h1{font-size:clamp(2rem,4.4vw,3.35rem);font-weight:800;letter-spacing:-.02em;max-width:16ch}
+h2{font-size:1.6rem;font-weight:800}
+.hero-content p,.page-intro p{color:var(--muted);font-size:1.03rem;max-width:640px;margin:0 auto}
+
+.hero-actions,.form-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px;justify-content:center}
+
+.btn{
+  border:0;border-radius:12px;padding:12px 22px;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:.92rem;
+  transition:transform var(--fast) var(--ease), box-shadow var(--fast) var(--ease), background-color var(--fast) var(--ease);
+}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:translateY(0) scale(.97)}
+.btn-primary{background:var(--primary);color:#fff;box-shadow:0 10px 22px rgba(22,58,92,.22)}
+.btn-primary:hover{background:var(--primary-dark);box-shadow:0 14px 28px rgba(22,58,92,.3)}
 .btn-secondary{background:#fff;color:var(--primary);border:1px solid var(--border)}
-.section{padding:58px 0}
-.section-heading,.admin-toolbar,.panel-heading{display:flex;justify-content:space-between;align-items:end;gap:16px}
-.text-link{color:var(--primary);font-weight:800;font-size:.9rem}
-.news-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:22px}
-.news-card,.panel{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
-.news-card{padding:22px}
-.news-card h3{font-size:1.05rem;line-height:1.5;margin:10px 0 8px}
-.news-date{font-size:.78rem;color:var(--muted)}
-.news-card p{margin:0;color:#475569;font-size:.92rem;white-space:pre-line}
-.page-intro{background:#fff;border-bottom:1px solid var(--border);padding:44px 0}
-.news-list{display:grid;gap:14px}
-.news-list .news-card{padding:24px}
-.news-list .news-card h3{font-size:1.2rem}
-.empty-state{padding:38px;text-align:center;background:#fff;border:1px dashed var(--border);border-radius:var(--radius);color:var(--muted)}
-.site-footer{background:#fff;border-top:1px solid var(--border);margin-top:30px}
-.footer-inner{padding:20px 0;display:flex;justify-content:space-between;gap:16px;color:var(--muted);font-size:.78rem}
-.admin-section{padding-top:44px}
-.panel{padding:24px;margin-top:18px}
-.auth-panel{max-width:560px;margin:10px auto}
-.stack{display:grid;gap:16px}
-.field{display:grid;gap:6px;font-size:.88rem;font-weight:700}
-.field input,.field textarea{width:100%;border:1px solid var(--border);border-radius:11px;background:#fff;padding:11px 13px;color:var(--text);outline:none}
-.field input:focus,.field textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(31,79,122,.1)}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.form-message{padding:10px 12px;border-radius:10px;font-size:.85rem}
-.form-message.error{background:#fef3f2;color:var(--danger)}
-.form-message.success{background:#edf8f1;color:var(--success)}
-.admin-news-list{display:grid;gap:10px;margin-top:16px}
-.admin-news-item{padding:16px;border:1px solid var(--border);border-radius:12px;display:flex;justify-content:space-between;gap:14px;align-items:flex-start}
-.admin-news-item h3{margin:0 0 3px;font-size:1rem}
-.admin-news-item p{margin:4px 0 0;color:var(--muted);font-size:.85rem}
-.admin-actions{display:flex;gap:7px;flex:none}
-.small-btn{border:1px solid var(--border);background:#fff;border-radius:9px;padding:7px 10px;cursor:pointer;font-weight:700;font-size:.78rem}
+.btn-secondary:hover{border-color:var(--primary-light);box-shadow:var(--shadow-sm)}
+
+/* ==========================================================================
+   بخش‌ها — سرتیترهای وسط‌چین، شبکه‌ی کارت‌های وسط‌چین
+   ========================================================================== */
+.section{padding:64px 0}
+#latest{scroll-margin-top:96px}
+
+.section-heading{
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  gap:6px;margin-bottom:8px;
+}
+.text-link{
+  color:var(--primary);font-weight:800;font-size:.88rem;
+  padding-bottom:2px;border-bottom:2px solid transparent;
+  transition:border-color var(--fast) var(--ease), color var(--fast) var(--ease);
+}
+.text-link:hover{border-color:var(--accent);color:var(--accent-dark)}
+
+.news-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:26px}
+
+.news-card,.panel{
+  background:#fff;border:1px solid var(--border);
+  border-radius:var(--radius);box-shadow:var(--shadow-sm);
+}
+.news-card{
+  padding:30px 26px;text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  transition:transform var(--normal) var(--ease), box-shadow var(--normal) var(--ease), border-color var(--normal) var(--ease);
+}
+.news-card:hover{transform:translateY(-7px);box-shadow:var(--shadow-lg);border-color:var(--accent)}
+.news-card h3{font-size:1.05rem;line-height:1.55;margin:2px 0 0}
+.news-card p{margin:0;color:var(--muted);font-size:.92rem;white-space:pre-line;text-align:center}
+
+/* شارهٔ تاریخ به‌شکل مهر کوچک — عنصر بصری تکرارشونده‌ی سایت */
+.news-date{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:5px 15px;border:1px solid var(--accent);border-radius:999px;
+  background:var(--accent-soft);color:var(--primary-dark);
+  font-size:.72rem;font-weight:800;letter-spacing:.02em;
+}
+.news-date::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);flex:none}
+
+.page-intro{background:#fff;border-bottom:1px solid var(--border);padding:52px 0;text-align:center}
+.page-intro .container{display:flex;flex-direction:column;align-items:center}
+.news-list{display:grid;gap:16px;max-width:780px;margin:0 auto}
+.news-list .news-card{padding:28px 32px}
+.news-list .news-card h3{font-size:1.22rem}
+
+.empty-state{
+  padding:44px;text-align:center;background:#fff;
+  border:1px dashed var(--border);border-radius:var(--radius);color:var(--muted);
+}
+
+.site-footer{background:#fff;border-top:1px solid var(--border);margin-top:36px}
+.footer-inner{
+  padding:22px 0;display:flex;flex-direction:column;align-items:center;
+  gap:4px;color:var(--muted-soft);font-size:.78rem;text-align:center;
+}
+
+/* ==========================================================================
+   صفحه‌ی مدیریت — همان زبان طراحی، وسط‌چین و پیوسته با بقیه‌ی سایت
+   ========================================================================== */
+.admin-section{padding-top:52px}
+.panel{padding:28px;margin-top:20px}
+.auth-panel{max-width:520px;margin:12px auto;text-align:center;display:flex;flex-direction:column;align-items:center}
+.auth-panel .hero-actions,.auth-panel form{width:100%}
+
+.stack{display:grid;gap:18px}
+.field{display:grid;gap:7px;font-size:.88rem;font-weight:700;text-align:center}
+.field input,.field textarea{
+  width:100%;border:1px solid var(--border);border-radius:12px;
+  background:#fff;padding:12px 14px;color:var(--ink);outline:none;
+  transition:border-color var(--fast) var(--ease), box-shadow var(--fast) var(--ease);
+}
+.field input:focus,.field textarea:focus{
+  border-color:var(--primary);box-shadow:0 0 0 4px rgba(22,58,92,.1);
+}
+.field textarea{text-align:right;resize:vertical}
+
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-message{padding:11px 14px;border-radius:12px;font-size:.85rem;text-align:center}
+.form-message.error{background:var(--danger-soft);color:var(--danger)}
+.form-message.success{background:var(--success-soft);color:var(--success)}
+
+.admin-toolbar{
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  gap:14px;margin-bottom:6px;
+}
+.panel-heading{
+  display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;
+}
+.count-badge{
+  background:var(--surface-3);color:var(--primary);
+  padding:5px 12px;border-radius:999px;font-size:.75rem;font-weight:800;
+}
+
+.admin-news-list{display:grid;gap:12px;margin-top:18px}
+.admin-news-item{
+  padding:24px;border:1px solid var(--border);border-radius:var(--radius-sm);
+  display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;
+  transition:box-shadow var(--normal) var(--ease), border-color var(--normal) var(--ease);
+}
+.admin-news-item:hover{box-shadow:var(--shadow-sm);border-color:var(--primary-light)}
+.admin-news-item h3{margin:2px 0 0;font-size:1.02rem}
+.admin-news-item p{margin:0;color:var(--muted);font-size:.87rem}
+.admin-actions{display:flex;gap:8px;justify-content:center}
+.small-btn{
+  border:1px solid var(--border);background:#fff;border-radius:10px;
+  padding:8px 14px;cursor:pointer;font-weight:700;font-size:.8rem;
+  transition:background var(--fast) var(--ease), border-color var(--fast) var(--ease), transform var(--fast) var(--ease);
+}
+.small-btn:hover{background:var(--surface-3);border-color:var(--primary-light);transform:translateY(-1px)}
 .small-btn.danger{color:var(--danger)}
-.count-badge{background:#edf4fa;color:var(--primary);padding:4px 9px;border-radius:999px;font-size:.75rem;font-weight:800}
+.small-btn.danger:hover{background:var(--danger-soft);border-color:var(--danger)}
+
+/* ==========================================================================
+   واکنش‌گرا
+   ========================================================================== */
 @media (max-width:850px){
-  .header-inner{align-items:flex-start;padding:12px 0;flex-direction:column}
-  .nav{width:100%;justify-content:space-between}
-  .nav-link{flex:1;text-align:center}
-  .hero-content{padding:58px 0 64px}
+  .hero-content{padding:64px 0 72px}
   .news-grid{grid-template-columns:1fr 1fr}
 }
 @media (max-width:600px){
   .container,.narrow{width:min(100% - 22px,1120px)}
-  .school-name{font-size:.92rem}
+  .school-name{font-size:.94rem}
   .school-subtitle{font-size:.68rem}
-  .hero-content{padding:48px 0 54px}
+  .hero-content{padding:52px 0 60px}
+  .hero::before{width:400px;height:400px;margin:-200px 0 0 -200px}
+  .hero::after{width:300px;height:300px;margin:-150px 0 0 -150px}
   .news-grid,.form-grid{grid-template-columns:1fr}
-  .section-heading,.admin-toolbar,.panel-heading{align-items:flex-start;flex-direction:column}
-  .footer-inner{flex-direction:column}
-  .admin-news-item{flex-direction:column}
-  .admin-actions{width:100%}
-  .admin-actions .small-btn{flex:1}
+  .nav{width:100%;justify-content:space-between}
+  .nav-link{flex:1;text-align:center}
+  .news-list .news-card{padding:24px}
 }
