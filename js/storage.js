@@ -39,3 +39,30 @@ function escapeHtml(value) {
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 }
+
+/*
+  انیمیشن ورودِ هنگام اسکرول.
+  عناصر دارای کلاس reveal را رصد می‌کند و با ورود به دید، کلاس is-visible
+  را اضافه می‌کند (استایل مربوطه در css/style.css تعریف شده است).
+  در مرورگرهای بدون IntersectionObserver، همه چیز بدون انیمیشن نمایش داده می‌شود.
+*/
+function initScrollReveal(root = document) {
+  const items = root.querySelectorAll(".reveal:not(.is-visible)");
+  if (!items.length) return;
+
+  if (!("IntersectionObserver" in window)) {
+    items.forEach((el) => el.classList.add("is-visible"));
+    return;
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("is-visible");
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15, rootMargin: "0px 0px -40px 0px" });
+
+  items.forEach((el) => observer.observe(el));
+}
