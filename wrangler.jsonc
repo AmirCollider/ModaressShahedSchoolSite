@@ -2,10 +2,11 @@
  * پیکربندی استقرار وب‌سایت «مدرسه شاهد» روی Cloudflare Workers.
  * مستندات رسمی: https://developers.cloudflare.com/workers/wrangler/configuration/
  *
- * این پروژه یک اسکریپت Worker کوچک (worker.js) دارد که فقط سه مسیر API برای
- * ورود/خروج پنل مدیریت را مدیریت می‌کند و بقیه‌ی درخواست‌ها را بدون تغییر به
- * همان فایل‌های استاتیک قبلی می‌سپارد. دقیقاً به همین دلیل، حالا بخش
- * «Runtime variables and secrets» در داشبورد Cloudflare فعال است.
+ * این پروژه یک اسکریپت Worker کوچک (worker.js) دارد که:
+ *  - مسیرهای ورود/خروج پنل مدیریت را با یک Secret واقعی بررسی می‌کند،
+ *  - کارمندان و تصاویر سایت (لوگو/عکس محیط مدرسه) را در Cloudflare R2
+ *    می‌خواند/می‌نویسد تا برای همه‌ی بازدیدکننده‌ها یکسان دیده شوند،
+ *  - و بقیه‌ی درخواست‌ها را بدون تغییر به همان فایل‌های استاتیک می‌سپارد.
  *
  * راه‌اندازی اولیه (فقط یک بار):
  *   wrangler secret put ADMIN_PASSWORD
@@ -19,23 +20,30 @@
 
   "main": "worker.js",
 
-  // ریشه‌ی همین مخزن (index.html، news.html، admin.html، css/، js/، assets/)
+  // ریشه‌ی همین مخزن (index.html، news.html، admin.html، staff.html، css/، js/)
   // به‌عنوان دارایی استاتیک منتشر می‌شود. worker.js و این فایل، طبق
   // .assetsignore، از این فهرست مستثنا هستند.
   "assets": {
     "directory": "./",
     "binding": "ASSETS"
-  }
+  },
+
+  // باکت Cloudflare R2 (طبق AboutSite.md) — الان واقعاً توسط worker.js مصرف
+  // می‌شود: عکس‌های کارمندان، لوگو، عکس محیط مدرسه و فهرست کارمندان
+  // (data/staff.json) این‌جا ذخیره می‌شوند.
+  "r2_buckets": [
+    {
+      "binding": "R2",
+      "bucket_name": "modaressshahedschoolsite-r2"
+    }
+  ]
 
   // ---------------------------------------------------------------------
-  // زیرساخت مستندشده در AboutSite.md (Cloudflare D1 و Cloudflare R2).
-  // فعلاً به‌صورت کامنت نگه داشته شده چون هیچ کدی در worker.js این دو
-  // بایندینگ را مصرف نمی‌کند (اخبار هنوز در localStorage مرورگر ذخیره
-  // می‌شود — به توضیح مربوطه در چت مراجعه کنید). هر وقت خواستید مثلاً
-  // اخبار را در D1 ذخیره کنید یا فایلی از R2 سرو کنید، کافی است این بخش
-  // را از حالت کامنت خارج کنید و database_id را از خروجی
-  // «wrangler d1 create modaressshahedschoolsite-db» یا داشبورد Cloudflare
-  // کپی کنید.
+  // Cloudflare D1 (طبق AboutSite.md) فعلاً استفاده نمی‌شود — اطلاعیه‌ها
+  // همچنان در localStorage مرورگر مدیر ذخیره می‌شوند (محدودیتی که در چت
+  // توضیح داده شد). اگر بعداً خواستید اطلاعیه‌ها را هم مثل کارمندان به‌صورت
+  // مشترک ذخیره کنید، این بخش را از حالت کامنت خارج کنید و database_id را
+  // از خروجی «wrangler d1 create modaressshahedschoolsite-db» کپی کنید.
   //
   // "d1_databases": [
   //   {
@@ -43,14 +51,5 @@
   //     "database_name": "modaressshahedschoolsite-db",
   //     "database_id": "PUT_YOUR_D1_DATABASE_ID_HERE"
   //   }
-  // ],
-  // "r2_buckets": [
-  //   {
-  //     "binding": "R2",
-  //     "bucket_name": "modaressshahedschoolsite-r2"
-  //   }
   // ]
-  //
-  // نکته: دامنه‌ی سفارشی R2 (https://dl.modares12.com) از داشبورد Cloudflare،
-  // بخش R2 › نام باکت › Settings › Custom Domains تنظیم می‌شود، نه از این فایل.
 }
