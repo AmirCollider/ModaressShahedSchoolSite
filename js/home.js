@@ -14,4 +14,25 @@ function renderLatest() {
   `).join("");
   initScrollReveal(target);
 }
-document.addEventListener("DOMContentLoaded", renderLatest);
+
+async function renderStaffPreview() {
+  const target = document.getElementById("staff-preview");
+  if (!target) return;
+
+  try {
+    const items = (await fetchStaffList()).slice(0, 4);
+    if (!items.length) {
+      target.innerHTML = '<div class="empty-state">هنوز کارمندی ثبت نشده است.</div>';
+      return;
+    }
+    target.innerHTML = items.map(renderStaffCard).join("");
+    initScrollReveal(target);
+  } catch {
+    target.innerHTML = '<div class="empty-state">خطا در دریافت اطلاعات کارمندان.</div>';
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  renderLatest();
+  renderStaffPreview();
+});
