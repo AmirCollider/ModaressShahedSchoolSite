@@ -66,3 +66,30 @@ function initScrollReveal(root = document) {
 
   items.forEach((el) => observer.observe(el));
 }
+
+/*
+  اطلاعات کارمندان دیگر در localStorage نیست (چون باید برای همه‌ی بازدیدکننده‌ها
+  یکسان دیده شود، نه فقط مرورگر مدیر) — از طریق Worker و Cloudflare R2 خوانده
+  می‌شود. renderStaffCard در صفحه‌ی اصلی و صفحه‌ی کارمندان مشترک است.
+*/
+function renderStaffCard(item) {
+  const initial = escapeHtml((item.name || "؟").trim().charAt(0) || "؟");
+  const photo = item.photoUrl
+    ? `<img class="staff-photo" src="${escapeHtml(item.photoUrl)}" alt="${escapeHtml(item.name)}" loading="lazy">`
+    : `<div class="staff-photo staff-photo-placeholder">${initial}</div>`;
+
+  return `
+    <article class="staff-card reveal">
+      ${photo}
+      <h3>${escapeHtml(item.name)}</h3>
+      <div class="staff-role">${escapeHtml(item.role)}</div>
+    </article>
+  `;
+}
+
+async function fetchStaffList() {
+  const res = await fetch("/api/staff");
+  if (!res.ok) throw new Error("staff fetch failed");
+  const data = await res.json();
+  return Array.isArray(data.items) ? data.items : [];
+}
