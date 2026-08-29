@@ -76,11 +76,16 @@ img{max-width:100%;display:block}
   transition:opacity var(--slow) var(--ease), transform var(--slow) var(--ease);
 }
 .reveal.is-visible{opacity:1;transform:translateY(0)}
-.news-grid .reveal:nth-child(1),.news-list .reveal:nth-child(1),.admin-news-list .reveal:nth-child(1){transition-delay:.03s}
-.news-grid .reveal:nth-child(2),.news-list .reveal:nth-child(2),.admin-news-list .reveal:nth-child(2){transition-delay:.11s}
-.news-grid .reveal:nth-child(3),.news-list .reveal:nth-child(3),.admin-news-list .reveal:nth-child(3){transition-delay:.19s}
-.news-grid .reveal:nth-child(4),.news-list .reveal:nth-child(4),.admin-news-list .reveal:nth-child(4){transition-delay:.27s}
-.news-grid .reveal:nth-child(n+5),.news-list .reveal:nth-child(n+5),.admin-news-list .reveal:nth-child(n+5){transition-delay:.33s}
+.news-grid .reveal:nth-child(1),.news-list .reveal:nth-child(1),.admin-news-list .reveal:nth-child(1),
+.staff-grid .reveal:nth-child(1),.admin-staff-list .reveal:nth-child(1){transition-delay:.03s}
+.news-grid .reveal:nth-child(2),.news-list .reveal:nth-child(2),.admin-news-list .reveal:nth-child(2),
+.staff-grid .reveal:nth-child(2),.admin-staff-list .reveal:nth-child(2){transition-delay:.11s}
+.news-grid .reveal:nth-child(3),.news-list .reveal:nth-child(3),.admin-news-list .reveal:nth-child(3),
+.staff-grid .reveal:nth-child(3),.admin-staff-list .reveal:nth-child(3){transition-delay:.19s}
+.news-grid .reveal:nth-child(4),.news-list .reveal:nth-child(4),.admin-news-list .reveal:nth-child(4),
+.staff-grid .reveal:nth-child(4),.admin-staff-list .reveal:nth-child(4){transition-delay:.27s}
+.news-grid .reveal:nth-child(n+5),.news-list .reveal:nth-child(n+5),.admin-news-list .reveal:nth-child(n+5),
+.staff-grid .reveal:nth-child(n+5),.admin-staff-list .reveal:nth-child(n+5){transition-delay:.33s}
 
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
@@ -119,19 +124,20 @@ img{max-width:100%;display:block}
 .school-subtitle{font-size:.76rem;color:var(--muted);white-space:nowrap;text-align:center}
 
 .nav{
-  display:flex;align-items:center;gap:2px;
+  display:flex;align-items:center;gap:2px;flex-wrap:wrap;justify-content:center;
   background:var(--surface-3);padding:6px;border-radius:999px;
 }
 .nav-link{
-  padding:9px 18px;border-radius:999px;color:var(--muted);
-  font-size:.88rem;font-weight:700;
+  padding:9px 16px;border-radius:999px;color:var(--muted);
+  font-size:.86rem;font-weight:700;white-space:nowrap;
   transition:background var(--fast) var(--ease), color var(--fast) var(--ease), box-shadow var(--fast) var(--ease);
 }
 .nav-link:hover{background:#fff;color:var(--primary);box-shadow:var(--shadow-sm)}
 .nav-link.active{background:var(--primary);color:#fff;box-shadow:0 8px 18px rgba(22,58,92,.25)}
 
 /* ==========================================================================
-   قهرمان صفحه‌ی اصلی — نشان مهرگونه‌ی تزئینی پشت متن، کاملاً وسط‌چین
+   قهرمان صفحه‌ی اصلی — عکس محیط مدرسه (در صورت وجود) با روکش تیره‌ی متنی،
+   یا حلقه‌های تزئینیِ مُهرگونه در حالت پیش‌فرض بدون عکس
    ========================================================================== */
 .hero{
   position:relative;overflow:hidden;text-align:center;
@@ -140,7 +146,7 @@ img{max-width:100%;display:block}
 }
 .hero::before,.hero::after{
   content:"";position:absolute;top:50%;left:50%;border-radius:50%;
-  pointer-events:none;
+  pointer-events:none;z-index:0;
 }
 .hero::before{
   width:600px;height:600px;margin:-300px 0 0 -300px;
@@ -150,6 +156,26 @@ img{max-width:100%;display:block}
   width:440px;height:440px;margin:-220px 0 0 -220px;
   border:1px solid rgba(13,39,64,.08);
 }
+/* data-loaded فقط بعد از موفقیت واقعیِ بارگذاری عکس (رویداد onload) ست می‌شود
+   تا پیش از مشخص‌شدن نتیجه (یا وقتی عکسی هنوز آپلود نشده) هیچ فلاشِ رنگ
+   تیره/متن سفید دیده نشود. */
+.hero:has(.hero-photo[data-loaded])::before,.hero:has(.hero-photo[data-loaded])::after{display:none}
+
+.hero-photo{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  z-index:0;pointer-events:none;user-select:none;
+}
+.hero-overlay{position:absolute;inset:0;z-index:0;display:none;opacity:0;transition:opacity .4s var(--ease)}
+.hero-photo + .hero-overlay{
+  display:block;
+  background:linear-gradient(180deg, rgba(13,39,64,.74) 0%, rgba(13,39,64,.5) 55%, rgba(255,255,255,.96) 100%);
+}
+.hero-photo[data-loaded] + .hero-overlay{opacity:1}
+.hero-photo[data-loaded] + .hero-overlay ~ .hero-content h1,
+.hero-photo[data-loaded] + .hero-overlay ~ .hero-content p{color:#fff}
+.hero-photo[data-loaded] + .hero-overlay ~ .hero-content .eyebrow{color:var(--accent-soft)}
+.hero-photo[data-loaded] + .hero-overlay ~ .hero-content .eyebrow::before{background:var(--accent-soft)}
+
 .hero-content{
   position:relative;z-index:1;
   display:flex;flex-direction:column;align-items:center;text-align:center;
@@ -192,7 +218,7 @@ h2{font-size:1.6rem;font-weight:800}
    بخش‌ها — سرتیترهای وسط‌چین، شبکه‌ی کارت‌های وسط‌چین
    ========================================================================== */
 .section{padding:64px 0}
-#latest{scroll-margin-top:96px}
+#latest,#staff-preview-section{scroll-margin-top:96px}
 
 .section-heading{
   display:flex;flex-direction:column;align-items:center;text-align:center;
@@ -220,14 +246,14 @@ h2{font-size:1.6rem;font-weight:800}
 .news-card h3{font-size:1.05rem;line-height:1.55;margin:2px 0 0}
 .news-card p{margin:0;color:var(--muted);font-size:.92rem;white-space:pre-line;text-align:center}
 
-/* شارهٔ تاریخ به‌شکل مهر کوچک — عنصر بصری تکرارشونده‌ی سایت */
-.news-date{
+/* شارهٔ تاریخ/سمت به‌شکل مهر کوچک — عنصر بصری تکرارشونده‌ی سایت */
+.news-date,.staff-role{
   display:inline-flex;align-items:center;gap:7px;
   padding:5px 15px;border:1px solid var(--accent);border-radius:999px;
   background:var(--accent-soft);color:var(--primary-dark);
   font-size:.72rem;font-weight:800;letter-spacing:.02em;
 }
-.news-date::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);flex:none}
+.news-date::before,.staff-role::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);flex:none}
 
 .page-intro{background:#fff;border-bottom:1px solid var(--border);padding:52px 0;text-align:center}
 .page-intro .container{display:flex;flex-direction:column;align-items:center}
@@ -238,6 +264,30 @@ h2{font-size:1.6rem;font-weight:800}
 .empty-state{
   padding:44px;text-align:center;background:#fff;
   border:1px dashed var(--border);border-radius:var(--radius);color:var(--muted);
+}
+
+/* ==========================================================================
+   کارت‌های کارمندان
+   ========================================================================== */
+.staff-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+  gap:18px;margin-top:26px;
+}
+.staff-card{
+  padding:28px 20px;text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  transition:transform var(--normal) var(--ease), box-shadow var(--normal) var(--ease), border-color var(--normal) var(--ease);
+}
+.staff-card:hover{transform:translateY(-7px);box-shadow:var(--shadow-lg);border-color:var(--accent)}
+.staff-card h3{font-size:1rem;margin:2px 0 0}
+
+.staff-photo{
+  width:96px;height:96px;border-radius:50%;object-fit:cover;flex:none;
+  border:3px solid #fff;box-shadow:0 0 0 3px var(--accent-soft), var(--shadow-sm);
+}
+.staff-photo-placeholder{
+  display:grid;place-items:center;background:var(--surface-3);
+  color:var(--primary);font-size:1.6rem;font-weight:800;
 }
 
 .site-footer{background:#fff;border-top:1px solid var(--border);margin-top:36px}
@@ -265,6 +315,10 @@ h2{font-size:1.6rem;font-weight:800}
   border-color:var(--primary);box-shadow:0 0 0 4px rgba(22,58,92,.1);
 }
 .field textarea{text-align:right;resize:vertical}
+.field input[type="file"]{
+  padding:10px 12px;background:var(--surface-3);cursor:pointer;text-align:center;
+}
+.field-hint{display:block;font-weight:400;color:var(--muted-soft);font-size:.78rem;margin-top:-2px}
 
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .form-message{padding:11px 14px;border-radius:12px;font-size:.85rem;text-align:center}
@@ -283,7 +337,7 @@ h2{font-size:1.6rem;font-weight:800}
   padding:5px 12px;border-radius:999px;font-size:.75rem;font-weight:800;
 }
 
-.admin-news-list{display:grid;gap:12px;margin-top:18px}
+.admin-news-list,.admin-staff-list{display:grid;gap:12px;margin-top:18px}
 .admin-news-item{
   padding:24px;border:1px solid var(--border);border-radius:var(--radius-sm);
   display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;
@@ -293,6 +347,9 @@ h2{font-size:1.6rem;font-weight:800}
 .admin-news-item h3{margin:2px 0 0;font-size:1.02rem}
 .admin-news-item p{margin:0;color:var(--muted);font-size:.87rem}
 .admin-actions{display:flex;gap:8px;justify-content:center}
+.admin-staff-info{display:flex;flex-direction:column;align-items:center;gap:8px}
+.admin-staff-info .staff-photo,.admin-staff-info .staff-photo-placeholder{width:64px;height:64px;font-size:1.2rem}
+
 .small-btn{
   border:1px solid var(--border);background:#fff;border-radius:10px;
   padding:8px 14px;cursor:pointer;font-weight:700;font-size:.8rem;
@@ -308,6 +365,7 @@ h2{font-size:1.6rem;font-weight:800}
 @media (max-width:850px){
   .hero-content{padding:64px 0 72px}
   .news-grid{grid-template-columns:1fr 1fr}
+  .staff-grid{grid-template-columns:repeat(3,1fr)}
 }
 @media (max-width:600px){
   .container,.narrow{width:min(100% - 22px,1120px)}
@@ -317,7 +375,8 @@ h2{font-size:1.6rem;font-weight:800}
   .hero::before{width:400px;height:400px;margin:-200px 0 0 -200px}
   .hero::after{width:300px;height:300px;margin:-150px 0 0 -150px}
   .news-grid,.form-grid{grid-template-columns:1fr}
+  .staff-grid{grid-template-columns:repeat(2,1fr)}
   .nav{width:100%;justify-content:space-between}
-  .nav-link{flex:1;text-align:center}
+  .nav-link{flex:1;text-align:center;padding:9px 8px}
   .news-list .news-card{padding:24px}
 }
