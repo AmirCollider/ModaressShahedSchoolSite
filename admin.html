@@ -14,7 +14,7 @@
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand" href="index.html">
-        <div class="logo-box"><img src="assets/logo.png" alt="لوگوی مدرسه" onerror="this.style.display='none'; this.parentElement.classList.add('logo-placeholder');"></div>
+        <div class="logo-box"><img id="admin-logo-img" src="https://dl.modares12.com/site/logo" alt="لوگوی مدرسه" onerror="this.style.display='none'; this.parentElement.classList.add('logo-placeholder');"></div>
         <div>
           <div class="school-name">مدرسه شاهد</div>
           <div class="school-subtitle">دبیرستان دوره دوم منطقه ۱۲ تهران</div>
@@ -23,6 +23,7 @@
       <nav class="nav" aria-label="منوی اصلی">
         <a class="nav-link" href="index.html">خانه</a>
         <a class="nav-link" href="news.html">اخبار و اطلاعیه‌ها</a>
+        <a class="nav-link" href="staff.html">کارمندان</a>
         <a class="nav-link active" href="admin.html">مدیریت</a>
       </nav>
     </div>
@@ -49,12 +50,16 @@
           <div class="admin-toolbar">
             <div>
               <span class="eyebrow">مدیریت محتوا</span>
-              <h1>مدیریت اطلاعیه‌ها</h1>
+              <h1>مدیریت سایت</h1>
             </div>
             <button id="logout-btn" class="btn btn-secondary" type="button">خروج</button>
           </div>
 
+          <!-- اطلاعیه‌ها -->
           <div class="panel">
+            <div class="panel-heading">
+              <h2>اطلاعیه‌ها</h2>
+            </div>
             <form id="news-form" class="stack">
               <input id="editing-id" type="hidden">
               <div class="form-grid">
@@ -85,6 +90,70 @@
               <span id="news-count" class="count-badge">۰ مورد</span>
             </div>
             <div id="admin-news-list" class="admin-news-list"></div>
+          </div>
+
+          <!-- کارمندان -->
+          <div class="panel">
+            <div class="panel-heading">
+              <h2>افزودن / ویرایش کارمند</h2>
+            </div>
+            <form id="staff-form" class="stack">
+              <input id="staff-editing-id" type="hidden">
+              <div class="form-grid">
+                <label class="field">
+                  <span>نام و نام خانوادگی</span>
+                  <input id="staff-name" type="text" maxlength="80" required placeholder="مثلاً علی رضایی">
+                </label>
+                <label class="field">
+                  <span>سمت</span>
+                  <input id="staff-role" type="text" maxlength="80" required placeholder="مثلاً مدیر مدرسه">
+                </label>
+              </div>
+              <label class="field">
+                <span>عکس پروفایل</span>
+                <input id="staff-photo" type="file" accept="image/*">
+                <span class="field-hint">اختیاری — هنگام ویرایش، اگر عکس جدیدی انتخاب نکنید همان عکس قبلی می‌ماند. حجم پیشنهادی: کمتر از ۲ مگابایت.</span>
+              </label>
+              <div class="form-actions">
+                <button class="btn btn-primary" type="submit" id="save-staff-btn">افزودن کارمند</button>
+                <button class="btn btn-secondary" type="button" id="cancel-staff-edit-btn" hidden>انصراف از ویرایش</button>
+              </div>
+              <div id="staff-save-message" class="form-message success" hidden>اطلاعات کارمند با موفقیت ذخیره شد.</div>
+              <div id="staff-error-message" class="form-message error" hidden></div>
+            </form>
+          </div>
+
+          <div class="panel">
+            <div class="panel-heading">
+              <h2>کارمندان موجود</h2>
+              <span id="staff-count" class="count-badge">۰ نفر</span>
+            </div>
+            <div id="admin-staff-list" class="admin-staff-list"></div>
+          </div>
+
+          <!-- تصاویر سایت -->
+          <div class="panel">
+            <div class="panel-heading">
+              <h2>تصاویر سایت</h2>
+            </div>
+            <form id="site-images-form" class="stack">
+              <div class="form-grid">
+                <label class="field">
+                  <span>لوگوی مدرسه</span>
+                  <input id="site-logo" type="file" accept="image/*">
+                </label>
+                <label class="field">
+                  <span>عکس محیط مدرسه</span>
+                  <input id="site-campus" type="file" accept="image/*">
+                </label>
+              </div>
+              <span class="field-hint">هرکدام را که می‌خواهید تغییر دهید انتخاب کنید؛ لازم نیست هر دو را با هم آپلود کنید.</span>
+              <div class="form-actions">
+                <button class="btn btn-primary" type="submit" id="save-site-images-btn">بارگذاری تصاویر</button>
+              </div>
+              <div id="site-images-message" class="form-message success" hidden>تصاویر با موفقیت به‌روزرسانی شد.</div>
+              <div id="site-images-error" class="form-message error" hidden></div>
+            </form>
           </div>
         </div>
       </div>
