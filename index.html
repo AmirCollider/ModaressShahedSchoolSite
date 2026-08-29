@@ -15,7 +15,7 @@
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand" href="index.html" aria-label="صفحه اصلی">
-        <div class="logo-box"><img src="assets/logo.png" alt="لوگوی مدرسه" onerror="this.style.display='none'; this.parentElement.classList.add('logo-placeholder');"></div>
+        <div class="logo-box"><img src="https://dl.modares12.com/site/logo" alt="لوگوی مدرسه" onerror="this.style.display='none'; this.parentElement.classList.add('logo-placeholder');"></div>
         <div>
           <div class="school-name">مدرسه شاهد</div>
           <div class="school-subtitle">دبیرستان دوره دوم منطقه ۱۲ تهران</div>
@@ -24,6 +24,7 @@
       <nav class="nav" aria-label="منوی اصلی">
         <a class="nav-link active" href="index.html">خانه</a>
         <a class="nav-link" href="news.html">اخبار و اطلاعیه‌ها</a>
+        <a class="nav-link" href="staff.html">کارمندان</a>
         <a class="nav-link" href="admin.html">مدیریت</a>
       </nav>
     </div>
@@ -31,6 +32,8 @@
 
   <main>
     <section class="hero">
+      <img class="hero-photo" src="https://dl.modares12.com/site/campus" alt="" draggable="false" fetchpriority="high" onload="this.dataset.loaded='1'" onerror="this.nextElementSibling.remove(); this.remove();">
+      <div class="hero-overlay"></div>
       <div class="container hero-content">
         <span class="eyebrow">به وب‌سایت مدرسه خوش آمدید</span>
         <h1>مدرسه شاهد<br>دبیرستان دوره دوم منطقه ۱۲ تهران</h1>
@@ -52,6 +55,19 @@
           <a class="text-link" href="news.html">مشاهده همه</a>
         </div>
         <div id="latest-news" class="news-grid" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section id="staff-preview-section" class="section">
+      <div class="container">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">با ما آشنا شوید</span>
+            <h2>کادر مدرسه</h2>
+          </div>
+          <a class="text-link" href="staff.html">مشاهده همه</a>
+        </div>
+        <div id="staff-preview" class="staff-grid" aria-live="polite"></div>
       </div>
     </section>
   </main>
