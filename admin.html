@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#163a5c">
-  <title>مدیریت | مدرسه شاهد</title>
+  <title>مدیریت سایت | مدرسه شاهد</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet">
@@ -24,7 +24,8 @@
         <a class="nav-link" href="index.html">خانه</a>
         <a class="nav-link" href="news.html">اخبار و اطلاعیه‌ها</a>
         <a class="nav-link" href="staff.html">کارمندان</a>
-        <a class="nav-link active" href="admin.html">مدیریت</a>
+        <a class="nav-link" href="gallery.html">گالری</a>
+        <a class="nav-link active" href="admin.html">مدیریت سایت</a>
       </nav>
     </div>
   </header>
@@ -129,6 +130,70 @@
               <span id="staff-count" class="count-badge">۰ نفر</span>
             </div>
             <div id="admin-staff-list" class="admin-staff-list"></div>
+          </div>
+
+          <!-- گالری تصاویر -->
+          <div class="panel">
+            <div class="panel-heading">
+              <h2>افزودن تصویر به گالری</h2>
+            </div>
+            <form id="gallery-form" class="stack">
+              <label class="field">
+                <span>عکس</span>
+                <input id="gallery-photo" type="file" accept="image/*" required>
+              </label>
+              <label class="field">
+                <span>توضیح کوتاه (اختیاری)</span>
+                <input id="gallery-caption" type="text" maxlength="120" placeholder="مثلاً جشن روز دانش‌آموز">
+              </label>
+              <div class="form-actions">
+                <button class="btn btn-primary" type="submit" id="save-gallery-btn">افزودن به گالری</button>
+              </div>
+              <div id="gallery-save-message" class="form-message success" hidden>تصویر با موفقیت اضافه شد.</div>
+              <div id="gallery-error-message" class="form-message error" hidden></div>
+            </form>
+          </div>
+
+          <div class="panel">
+            <div class="panel-heading">
+              <h2>تصاویر گالری</h2>
+              <span id="gallery-count" class="count-badge">۰ تصویر</span>
+            </div>
+            <div id="admin-gallery-list" class="admin-gallery-grid"></div>
+          </div>
+
+          <!-- پیوندهای مفید -->
+          <div class="panel">
+            <div class="panel-heading">
+              <h2>افزودن / ویرایش پیوند مفید</h2>
+            </div>
+            <form id="link-form" class="stack">
+              <input id="link-editing-id" type="hidden">
+              <div class="form-grid">
+                <label class="field">
+                  <span>عنوان پیوند</span>
+                  <input id="link-title" type="text" maxlength="60" required placeholder="مثلاً سایت آموزش و پرورش">
+                </label>
+                <label class="field">
+                  <span>آدرس (URL)</span>
+                  <input id="link-url" type="url" maxlength="300" required placeholder="https://example.ir">
+                </label>
+              </div>
+              <div class="form-actions">
+                <button class="btn btn-primary" type="submit" id="save-link-btn">افزودن پیوند</button>
+                <button class="btn btn-secondary" type="button" id="cancel-link-edit-btn" hidden>انصراف از ویرایش</button>
+              </div>
+              <div id="link-save-message" class="form-message success" hidden>پیوند با موفقیت ذخیره شد.</div>
+              <div id="link-error-message" class="form-message error" hidden></div>
+            </form>
+          </div>
+
+          <div class="panel">
+            <div class="panel-heading">
+              <h2>پیوندهای موجود</h2>
+              <span id="link-count" class="count-badge">۰ مورد</span>
+            </div>
+            <div id="admin-link-list" class="admin-news-list"></div>
           </div>
 
           <!-- تصاویر سایت -->
