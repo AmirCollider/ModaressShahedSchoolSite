@@ -37,6 +37,26 @@ const staffCount = document.getElementById("staff-count");
 const staffSaveMessage = document.getElementById("staff-save-message");
 const staffErrorMessage = document.getElementById("staff-error-message");
 
+const galleryForm = document.getElementById("gallery-form");
+const galleryPhotoInput = document.getElementById("gallery-photo");
+const galleryCaptionInput = document.getElementById("gallery-caption");
+const saveGalleryBtn = document.getElementById("save-gallery-btn");
+const adminGalleryList = document.getElementById("admin-gallery-list");
+const galleryCount = document.getElementById("gallery-count");
+const gallerySaveMessage = document.getElementById("gallery-save-message");
+const galleryErrorMessage = document.getElementById("gallery-error-message");
+
+const linkForm = document.getElementById("link-form");
+const linkTitleInput = document.getElementById("link-title");
+const linkUrlInput = document.getElementById("link-url");
+const linkEditingId = document.getElementById("link-editing-id");
+const saveLinkBtn = document.getElementById("save-link-btn");
+const cancelLinkEditBtn = document.getElementById("cancel-link-edit-btn");
+const adminLinkList = document.getElementById("admin-link-list");
+const linkCount = document.getElementById("link-count");
+const linkSaveMessage = document.getElementById("link-save-message");
+const linkErrorMessage = document.getElementById("link-error-message");
+
 const siteImagesForm = document.getElementById("site-images-form");
 const siteLogoInput = document.getElementById("site-logo");
 const siteCampusInput = document.getElementById("site-campus");
@@ -49,6 +69,8 @@ function showAdmin() {
   adminPanel.hidden = false;
   renderAdminNews();
   loadStaff();
+  loadGallery();
+  loadLinks();
 }
 
 function showLogin() {
@@ -303,6 +325,225 @@ adminStaffList.addEventListener("click", (event) => {
   }
 });
 
+/* -------------------------------- گالری (جدید) -------------------------------- */
+
+function renderAdminGallery(items) {
+  galleryCount.textContent = `${items.length.toLocaleString("fa-IR")} تصویر`;
+
+  if (!items.length) {
+    adminGalleryList.innerHTML = '<div class="empty-state">تصویری در گالری نیست.</div>';
+    return;
+  }
+
+  adminGalleryList.innerHTML = items.map(item => `
+    <div class="admin-gallery-item reveal">
+      <img src="${escapeHtml(item.photoUrl)}" alt="${escapeHtml(item.caption || "")}">
+      <button class="small-btn danger" type="button" data-gallery-delete="${escapeHtml(item.id)}">حذف</button>
+    </div>
+  `).join("");
+  initScrollReveal(adminGalleryList);
+}
+
+let galleryCache = [];
+
+async function loadGallery() {
+  try {
+    const res = await fetch("/api/gallery");
+    const data = await res.json();
+    galleryCache = Array.isArray(data.items) ? data.items : [];
+    renderAdminGallery(galleryCache);
+  } catch {
+    adminGalleryList.innerHTML = '<div class="empty-state">خطا در دریافت گالری.</div>';
+  }
+}
+
+galleryForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  galleryErrorMessage.hidden = true;
+
+  const photoFile = galleryPhotoInput.files[0];
+  if (!photoFile) {
+    galleryErrorMessage.textContent = "انتخاب یک تصویر الزامی است.";
+    galleryErrorMessage.hidden = false;
+    return;
+  }
+  if (photoFile.size > MAX_UPLOAD_BYTES) {
+    galleryErrorMessage.textContent = "حجم عکس بیشتر از ۵ مگابایت است.";
+    galleryErrorMessage.hidden = false;
+    return;
+  }
+
+  const formData = new FormData();
+  formData.set("photo", photoFile);
+  formData.set("caption", galleryCaptionInput.value.trim());
+
+  saveGalleryBtn.disabled = true;
+  try {
+    const res = await fetch("/api/gallery", { method: "POST", body: formData });
+    const data = await res.json();
+
+    if (res.ok && data.ok) {
+      galleryCache = data.items;
+      renderAdminGallery(galleryCache);
+      galleryForm.reset();
+      gallerySaveMessage.hidden = false;
+      setTimeout(() => gallerySaveMessage.hidden = true, 2200);
+    } else {
+      galleryErrorMessage.textContent = data.error || "خطا در ذخیره‌سازی.";
+      galleryErrorMessage.hidden = false;
+    }
+  } catch {
+    galleryErrorMessage.textContent = "خطا در ارتباط با سرور. دوباره تلاش کنید.";
+    galleryErrorMessage.hidden = false;
+  } finally {
+    saveGalleryBtn.disabled = false;
+  }
+});
+
+adminGalleryList.addEventListener("click", (event) => {
+  const deleteId = event.target.getAttribute("data-gallery-delete");
+  if (!deleteId) return;
+
+  if (confirm("این تصویر از گالری حذف شود؟")) {
+    fetch("/api/gallery-delete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: deleteId })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.ok) {
+          galleryCache = data.items;
+          renderAdminGallery(galleryCache);
+        }
+      })
+      .catch(() => {});
+  }
+});
+
+/* ---------------------------- پیوندهای مفید (جدید) ---------------------------- */
+
+function renderAdminLinks(items) {
+  linkCount.textContent = `${items.length.toLocaleString("fa-IR")} مورد`;
+
+  if (!items.length) {
+    adminLinkList.innerHTML = '<div class="empty-state">پیوندی ثبت نشده است.</div>';
+    return;
+  }
+
+  adminLinkList.innerHTML = items.map(item => `
+    <article class="admin-news-item reveal">
+      <div>
+        <h3>${escapeHtml(item.title)}</h3>
+        <p>${escapeHtml(item.url)}</p>
+      </div>
+      <div class="admin-actions">
+        <button class="small-btn" type="button" data-link-edit="${escapeHtml(item.id)}">ویرایش</button>
+        <button class="small-btn danger" type="button" data-link-delete="${escapeHtml(item.id)}">حذف</button>
+      </div>
+    </article>
+  `).join("");
+  initScrollReveal(adminLinkList);
+}
+
+let linksCache = [];
+
+async function loadLinks() {
+  try {
+    const res = await fetch("/api/links");
+    const data = await res.json();
+    linksCache = Array.isArray(data.items) ? data.items : [];
+    renderAdminLinks(linksCache);
+  } catch {
+    adminLinkList.innerHTML = '<div class="empty-state">خطا در دریافت پیوندها.</div>';
+  }
+}
+
+function resetLinkForm() {
+  linkForm.reset();
+  linkEditingId.value = "";
+  saveLinkBtn.textContent = "افزودن پیوند";
+  cancelLinkEditBtn.hidden = true;
+  linkErrorMessage.hidden = true;
+}
+
+linkForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  linkErrorMessage.hidden = true;
+
+  const body = {
+    title: linkTitleInput.value.trim(),
+    url: linkUrlInput.value.trim()
+  };
+  if (linkEditingId.value) body.id = linkEditingId.value;
+
+  saveLinkBtn.disabled = true;
+  try {
+    const res = await fetch("/api/links", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+
+    if (res.ok && data.ok) {
+      linksCache = data.items;
+      renderAdminLinks(linksCache);
+      resetLinkForm();
+      linkSaveMessage.hidden = false;
+      setTimeout(() => linkSaveMessage.hidden = true, 2200);
+    } else {
+      linkErrorMessage.textContent = data.error || "خطا در ذخیره‌سازی.";
+      linkErrorMessage.hidden = false;
+    }
+  } catch {
+    linkErrorMessage.textContent = "خطا در ارتباط با سرور. دوباره تلاش کنید.";
+    linkErrorMessage.hidden = false;
+  } finally {
+    saveLinkBtn.disabled = false;
+  }
+});
+
+cancelLinkEditBtn.addEventListener("click", resetLinkForm);
+
+adminLinkList.addEventListener("click", (event) => {
+  const editId = event.target.getAttribute("data-link-edit");
+  const deleteId = event.target.getAttribute("data-link-delete");
+
+  if (editId) {
+    const item = linksCache.find(x => x.id === editId);
+    if (!item) return;
+    linkEditingId.value = item.id;
+    linkTitleInput.value = item.title;
+    linkUrlInput.value = item.url;
+    saveLinkBtn.textContent = "ذخیره تغییرات";
+    cancelLinkEditBtn.hidden = false;
+    linkTitleInput.focus();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  if (deleteId) {
+    const item = linksCache.find(x => x.id === deleteId);
+    if (!item) return;
+
+    if (confirm(`پیوند «${item.title}» حذف شود؟`)) {
+      fetch("/api/links-delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: deleteId })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.ok) {
+            linksCache = data.items;
+            renderAdminLinks(linksCache);
+          }
+        })
+        .catch(() => {});
+    }
+  }
+});
+
 /* ---------------------------- تصاویر سایت (جدید) ---------------------------- */
 
 siteImagesForm.addEventListener("submit", async (event) => {
@@ -363,6 +604,7 @@ document.getElementById("logout-btn").addEventListener("click", async () => {
   }
   resetForm();
   resetStaffForm();
+  resetLinkForm();
   showLogin();
 });
 
