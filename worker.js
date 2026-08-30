@@ -2,13 +2,13 @@
   Worker اصلی سایت مدرسه شاهد.
 
   ۱) هر درخواستی که به مسیرهای زیر نباشد را بدون هیچ تغییری به همان فایل‌های
-     استاتیک قبلی (index.html، news.html، admin.html، staff.html، css/، js/)
-     می‌سپارد.
+     استاتیک قبلی (index.html، news.html، admin.html، staff.html، gallery.html،
+     css/، js/) می‌سپارد.
   ۲) مسیرهای ورود/خروج پنل مدیریت را مدیریت می‌کند (رمز به‌صورت Secret واقعی).
-  ۳) مسیرهای کارمندان و تصاویر سایت (لوگو/عکس محیط مدرسه) را از/به
-     Cloudflare R2 می‌خواند و می‌نویسد — این‌ها برای همه‌ی بازدیدکننده‌ها
-     یکسان دیده می‌شوند (برخلاف اطلاعیه‌ها که هنوز در localStorage مرورگر
-     مدیر ذخیره می‌شوند).
+  ۳) مسیرهای کارمندان، گالری تصاویر، پیوندهای مفید و تصاویر سایت
+     (لوگو/عکس محیط مدرسه) را از/به Cloudflare R2 می‌خواند و می‌نویسد —
+     این‌ها برای همه‌ی بازدیدکننده‌ها یکسان دیده می‌شوند (برخلاف اطلاعیه‌ها
+     که هنوز در localStorage مرورگر مدیر ذخیره می‌شوند).
 
   راه‌اندازی روی Cloudflare (فقط یک‌بار):
     wrangler secret put ADMIN_PASSWORD
@@ -19,9 +19,21 @@
 const COOKIE_NAME = "admin_session";
 const SESSION_DURATION_SECONDS = 8 * 60 * 60; // ۸ ساعت
 const STAFF_KEY = "data/staff.json";
+const GALLERY_KEY = "data/gallery.json";
+const LINKS_KEY = "data/links.json";
 // دامنه‌ی سفارشیِ عمومیِ باکت R2 (طبق AboutSite.md). اگر این دامنه را عوض
 // کردید، همین یک خط را به‌روزرسانی کنید.
 const R2_PUBLIC_BASE_URL = "https://dl.modares12.com";
+
+// پیوندهای پیش‌فرض — فقط تا وقتی نمایش داده می‌شوند که مدیر هنوز هیچ
+// پیوندی از پنل مدیریت ذخیره نکرده باشد (یعنی data/links.json در R2
+// وجود ندارد). شناسه‌ها عمداً ثابت‌اند تا اگر مدیر یکی از همین‌ها را
+// ویرایش/حذف کند، به‌درستی همان مورد به‌روزرسانی شود.
+const DEFAULT_LINKS = [
+  { id: "default-medu", title: "وزارت آموزش و پرورش", url: "https://www.medu.ir/fa/" },
+  { id: "default-mymedu", title: "سامانه دانش‌آموزی (مای مدیو)", url: "https://my.medu.ir/" },
+  { id: "default-district12", title: "آموزش و پرورش منطقه ۱۲ تهران", url: "https://medu.ir/fa?ocode=90111200" }
+];
 
 export default {
   async fetch(request, env) {
@@ -47,6 +59,30 @@ export default {
     if (url.pathname === "/api/staff-delete" && request.method === "POST") {
       if (!(await requireAuth(request, env))) return unauthorized();
       return handleDeleteStaff(request, env);
+    }
+
+    if (url.pathname === "/api/gallery" && request.method === "GET") {
+      return handleGetGallery(env);
+    }
+    if (url.pathname === "/api/gallery" && request.method === "POST") {
+      if (!(await requireAuth(request, env))) return unauthorized();
+      return handleSaveGalleryItem(request, env);
+    }
+    if (url.pathname === "/api/gallery-delete" && request.method === "POST") {
+      if (!(await requireAuth(request, env))) return unauthorized();
+      return handleDeleteGalleryItem(request, env);
+    }
+
+    if (url.pathname === "/api/links" && request.method === "GET") {
+      return handleGetLinks(env);
+    }
+    if (url.pathname === "/api/links" && request.method === "POST") {
+      if (!(await requireAuth(request, env))) return unauthorized();
+      return handleSaveLink(request, env);
+    }
+    if (url.pathname === "/api/links-delete" && request.method === "POST") {
+      if (!(await requireAuth(request, env))) return unauthorized();
+      return handleDeleteLink(request, env);
     }
 
     if (url.pathname === "/api/site-images" && request.method === "POST") {
@@ -112,21 +148,25 @@ function unauthorized() {
 
 /* -------------------------------- کارمندان -------------------------------- */
 
-async function readStaffList(env) {
-  const obj = await env.R2.get(STAFF_KEY);
-  if (!obj) return [];
+async function readJsonList(env, key) {
+  const obj = await env.R2.get(key);
+  if (!obj) return null;
   try {
     const list = await obj.json();
-    return Array.isArray(list) ? list : [];
+    return Array.isArray(list) ? list : null;
   } catch {
-    return [];
+    return null;
   }
 }
 
-async function writeStaffList(env, list) {
-  await env.R2.put(STAFF_KEY, JSON.stringify(list), {
+async function writeJsonList(env, key, list) {
+  await env.R2.put(key, JSON.stringify(list), {
     httpMetadata: { contentType: "application/json; charset=utf-8" }
   });
+}
+
+async function readStaffList(env) {
+  return (await readJsonList(env, STAFF_KEY)) || [];
 }
 
 async function handleGetStaff(env) {
@@ -152,7 +192,7 @@ async function handleSaveStaff(request, env) {
   }
 
   const list = await readStaffList(env);
-  const id = existingId || makeStaffId();
+  const id = existingId || makeId("s");
   let record = list.find((item) => item.id === id);
   let photoUrl = record ? record.photoUrl || "" : "";
 
@@ -172,7 +212,7 @@ async function handleSaveStaff(request, env) {
     list.unshift(updatedRecord);
   }
 
-  await writeStaffList(env, list);
+  await writeJsonList(env, STAFF_KEY, list);
   return jsonResponse({ ok: true, items: list });
 }
 
@@ -189,7 +229,7 @@ async function handleDeleteStaff(request, env) {
 
   const list = await readStaffList(env);
   const next = list.filter((item) => item.id !== id);
-  await writeStaffList(env, next);
+  await writeJsonList(env, STAFF_KEY, next);
 
   try {
     await env.R2.delete(`staff-photos/${id}`);
@@ -200,8 +240,141 @@ async function handleDeleteStaff(request, env) {
   return jsonResponse({ ok: true, items: next });
 }
 
-function makeStaffId() {
-  return "s-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 7);
+/* -------------------------------- گالری تصاویر -------------------------------- */
+
+async function readGalleryList(env) {
+  return (await readJsonList(env, GALLERY_KEY)) || [];
+}
+
+async function handleGetGallery(env) {
+  const list = await readGalleryList(env);
+  return jsonResponse({ ok: true, items: list });
+}
+
+async function handleSaveGalleryItem(request, env) {
+  let formData;
+  try {
+    formData = await request.formData();
+  } catch {
+    return jsonResponse({ ok: false, error: "درخواست نامعتبر است." }, 400);
+  }
+
+  const caption = (formData.get("caption") || "").toString().trim();
+  const photo = formData.get("photo");
+
+  if (!photo || typeof photo !== "object" || photo.size === 0) {
+    return jsonResponse({ ok: false, error: "انتخاب یک تصویر الزامی است." }, 400);
+  }
+
+  const id = makeId("g");
+  const key = `gallery-photos/${id}`;
+  await env.R2.put(key, photo, {
+    httpMetadata: { contentType: photo.type || "image/jpeg", cacheControl: "public, max-age=300" }
+  });
+
+  const list = await readGalleryList(env);
+  list.unshift({ id, caption, photoUrl: `${R2_PUBLIC_BASE_URL}/${key}` });
+  await writeJsonList(env, GALLERY_KEY, list);
+
+  return jsonResponse({ ok: true, items: list });
+}
+
+async function handleDeleteGalleryItem(request, env) {
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonResponse({ ok: false, error: "درخواست نامعتبر است." }, 400);
+  }
+
+  const id = typeof body?.id === "string" ? body.id : "";
+  if (!id) return jsonResponse({ ok: false, error: "شناسه نامعتبر است." }, 400);
+
+  const list = await readGalleryList(env);
+  const next = list.filter((item) => item.id !== id);
+  await writeJsonList(env, GALLERY_KEY, next);
+
+  try {
+    await env.R2.delete(`gallery-photos/${id}`);
+  } catch {
+    // بی‌اهمیت اگر فایل عکسی برای حذف وجود نداشت
+  }
+
+  return jsonResponse({ ok: true, items: next });
+}
+
+/* -------------------------------- پیوندهای مفید -------------------------------- */
+
+async function readLinksList(env) {
+  const list = await readJsonList(env, LINKS_KEY);
+  return list || DEFAULT_LINKS.map((item) => ({ ...item }));
+}
+
+async function handleGetLinks(env) {
+  const list = await readLinksList(env);
+  return jsonResponse({ ok: true, items: list });
+}
+
+async function handleSaveLink(request, env) {
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonResponse({ ok: false, error: "درخواست نامعتبر است." }, 400);
+  }
+
+  const title = typeof body?.title === "string" ? body.title.trim() : "";
+  const rawUrl = typeof body?.url === "string" ? body.url.trim() : "";
+  const existingId = typeof body?.id === "string" ? body.id.trim() : "";
+
+  if (!title || !rawUrl) {
+    return jsonResponse({ ok: false, error: "عنوان و آدرس الزامی است." }, 400);
+  }
+
+  let parsedUrl;
+  try {
+    parsedUrl = new URL(rawUrl);
+  } catch {
+    return jsonResponse({ ok: false, error: "آدرس وارد‌شده معتبر نیست." }, 400);
+  }
+  if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
+    return jsonResponse({ ok: false, error: "آدرس باید با http یا https شروع شود." }, 400);
+  }
+
+  const list = await readLinksList(env);
+  const id = existingId || makeId("l");
+  const record = { id, title, url: parsedUrl.toString() };
+  const idx = list.findIndex((item) => item.id === id);
+  if (idx >= 0) {
+    list[idx] = record;
+  } else {
+    list.unshift(record);
+  }
+
+  await writeJsonList(env, LINKS_KEY, list);
+  return jsonResponse({ ok: true, items: list });
+}
+
+async function handleDeleteLink(request, env) {
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonResponse({ ok: false, error: "درخواست نامعتبر است." }, 400);
+  }
+
+  const id = typeof body?.id === "string" ? body.id : "";
+  if (!id) return jsonResponse({ ok: false, error: "شناسه نامعتبر است." }, 400);
+
+  const list = await readLinksList(env);
+  const next = list.filter((item) => item.id !== id);
+  await writeJsonList(env, LINKS_KEY, next);
+
+  return jsonResponse({ ok: true, items: next });
+}
+
+function makeId(prefix) {
+  return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
 /* ------------------------------- تصاویر سایت ------------------------------- */
