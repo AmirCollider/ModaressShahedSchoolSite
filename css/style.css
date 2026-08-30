@@ -290,6 +290,62 @@ h2{font-size:1.6rem;font-weight:800}
   color:var(--primary);font-size:1.6rem;font-weight:800;
 }
 
+/* ==========================================================================
+   گالری تصاویر — شبکه‌ی وسط‌چین + پنجره‌ی نمایش بزرگ (Lightbox)
+   ========================================================================== */
+.gallery-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:14px;margin-top:26px;
+}
+.gallery-item{
+  position:relative;display:block;border-radius:var(--radius);overflow:hidden;
+  aspect-ratio:4/3;background:var(--surface-3);border:1px solid var(--border);
+  box-shadow:var(--shadow-sm);cursor:pointer;padding:0;
+  transition:transform var(--normal) var(--ease), box-shadow var(--normal) var(--ease);
+}
+.gallery-item:hover{transform:translateY(-5px) scale(1.01);box-shadow:var(--shadow-lg)}
+.gallery-item img{width:100%;height:100%;object-fit:cover;transition:transform .5s var(--ease)}
+.gallery-item:hover img{transform:scale(1.07)}
+.gallery-caption{
+  position:absolute;inset-inline:0;bottom:0;padding:10px 12px;
+  background:linear-gradient(0deg, rgba(13,39,64,.78), transparent);
+  color:#fff;font-size:.78rem;font-weight:700;text-align:center;
+  opacity:0;transition:opacity var(--fast) var(--ease);
+}
+.gallery-item:hover .gallery-caption{opacity:1}
+
+.lightbox{
+  position:fixed;inset:0;z-index:60;background:rgba(13,39,64,.94);
+  display:flex;align-items:center;justify-content:center;padding:24px;
+  animation:fadeRise .25s var(--ease) both;
+}
+.lightbox[hidden]{display:none}
+.lightbox-figure{
+  max-width:min(900px,92vw);max-height:88vh;margin:0;
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+}
+.lightbox-figure img{max-width:100%;max-height:78vh;border-radius:var(--radius);box-shadow:var(--shadow-lg);object-fit:contain;background:#fff}
+.lightbox-figure figcaption{color:#fff;font-size:.9rem;text-align:center}
+.lightbox-close{
+  position:absolute;top:20px;left:20px;width:44px;height:44px;border-radius:50%;
+  border:0;background:rgba(255,255,255,.14);color:#fff;font-size:1.5rem;line-height:1;
+  cursor:pointer;transition:background var(--fast) var(--ease), transform var(--fast) var(--ease);
+}
+.lightbox-close:hover{background:rgba(255,255,255,.26);transform:scale(1.06)}
+
+/* ==========================================================================
+   پیوندهای مفید — ردیفی از دکمه‌های بیضی‌شکل، وسط‌چین
+   ========================================================================== */
+.links-grid{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:26px}
+.link-chip{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:12px 22px;border-radius:999px;background:#fff;border:1px solid var(--border);
+  font-weight:700;font-size:.88rem;color:var(--primary-dark);box-shadow:var(--shadow-sm);
+  transition:transform var(--fast) var(--ease), box-shadow var(--fast) var(--ease), border-color var(--fast) var(--ease);
+}
+.link-chip::before{content:"↗";color:var(--accent-dark);font-weight:800}
+.link-chip:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--accent)}
+
 .site-footer{background:#fff;border-top:1px solid var(--border);margin-top:36px}
 .footer-inner{
   padding:22px 0;display:flex;flex-direction:column;align-items:center;
@@ -349,6 +405,20 @@ h2{font-size:1.6rem;font-weight:800}
 .admin-actions{display:flex;gap:8px;justify-content:center}
 .admin-staff-info{display:flex;flex-direction:column;align-items:center;gap:8px}
 .admin-staff-info .staff-photo,.admin-staff-info .staff-photo-placeholder{width:64px;height:64px;font-size:1.2rem}
+
+.admin-gallery-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));
+  gap:12px;margin-top:18px;
+}
+.admin-gallery-item{
+  position:relative;border-radius:var(--radius-sm);overflow:hidden;
+  border:1px solid var(--border);aspect-ratio:1;background:var(--surface-3);
+}
+.admin-gallery-item img{width:100%;height:100%;object-fit:cover}
+.admin-gallery-item .small-btn{
+  position:absolute;bottom:8px;left:50%;transform:translateX(-50%);
+  background:rgba(255,255,255,.94);
+}
 
 .small-btn{
   border:1px solid var(--border);background:#fff;border-radius:10px;
