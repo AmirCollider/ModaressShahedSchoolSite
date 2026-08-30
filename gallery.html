@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#163a5c">
+  <title>گالری تصاویر | مدرسه شاهد</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="gallery">
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html">
+        <div class="logo-box"><img src="https://dl.modares12.com/site/logo" alt="لوگوی مدرسه" onerror="this.style.display='none'; this.parentElement.classList.add('logo-placeholder');"></div>
+        <div>
+          <div class="school-name">مدرسه شاهد</div>
+          <div class="school-subtitle">دبیرستان دوره دوم منطقه ۱۲ تهران</div>
+        </div>
+      </a>
+      <nav class="nav" aria-label="منوی اصلی">
+        <a class="nav-link" href="index.html">خانه</a>
+        <a class="nav-link" href="news.html">اخبار و اطلاعیه‌ها</a>
+        <a class="nav-link" href="staff.html">کارمندان</a>
+        <a class="nav-link active" href="gallery.html">گالری</a>
+        <a class="nav-link" href="admin.html">مدیریت سایت</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-main">
+    <section class="page-intro">
+      <div class="container">
+        <span class="eyebrow">تصاویر مدرسه</span>
+        <h1>گالری</h1>
+        <p>نگاهی به فضا و فعالیت‌های مدرسه شاهد.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div id="gallery-grid" class="gallery-grid" aria-live="polite"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="lightbox" class="lightbox" hidden>
+    <button class="lightbox-close" type="button" aria-label="بستن">×</button>
+    <figure class="lightbox-figure">
+      <img id="lightbox-img" src="" alt="">
+      <figcaption id="lightbox-caption"></figcaption>
+    </figure>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>مدرسه شاهد ـ دبیرستان دوره دوم منطقه ۱۲ تهران</span>
+      <span>سامانه اطلاع‌رسانی مدرسه</span>
+    </div>
+  </footer>
+
+  <script src="js/storage.js"></script>
+  <script src="js/gallery.js"></script>
+</body>
+</html>
